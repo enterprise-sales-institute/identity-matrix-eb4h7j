@@ -1,0 +1,126 @@
+# Kubernetes RBAC configuration for Multi-Touch Attribution Analytics System
+# Version: v1
+# Implements role-based access control with strict service isolation and explicit permission boundaries
+
+---
+# Backend service role with minimal required permissions
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: attribution-backend
+  namespace: attribution
+  labels:
+    app: attribution
+    component: backend
+    security-tier: restricted
+rules:
+- apiGroups: [""]
+  resources: ["secrets", "configmaps"]
+  verbs: ["get", "list"]
+  resourceNames: ["attribution-config", "backend-secrets"]
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list"]
+  resourceNames: ["attribution-backend-*"]
+- apiGroups: ["policy"]
+  resources: ["podsecuritypolicies"]
+  verbs: ["use"]
+  resourceNames: ["attribution-restricted"]
+
+---
+# Analytics service role with restricted access
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: attribution-analytics
+  namespace: attribution
+  labels:
+    app: attribution
+    component: analytics
+    security-tier: restricted
+rules:
+- apiGroups: [""]
+  resources: ["configmaps"]
+  verbs: ["get", "list"]
+  resourceNames: ["analytics-config"]
+- apiGroups: ["policy"]
+  resources: ["podsecuritypolicies"]
+  verbs: ["use"]
+  resourceNames: ["attribution-restricted"]
+
+---
+# Monitoring cluster role for observability
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: monitoring
+  labels:
+    app: attribution
+    component: monitoring
+    security-tier: system
+rules:
+- apiGroups: [""]
+  resources: ["pods", "nodes", "services"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["metrics.k8s.io"]
+  resources: ["pods", "nodes"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["events.k8s.io"]
+  resources: ["events"]
+  verbs: ["get", "list", "watch"]
+
+---
+# Backend service role binding
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: attribution-backend
+  namespace: attribution
+  labels:
+    app: attribution
+    component: backend
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: attribution-backend
+subjects:
+- kind: ServiceAccount
+  name: attribution-backend
+  namespace: attribution
+
+---
+# Analytics service role binding
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: attribution-analytics
+  namespace: attribution
+  labels:
+    app: attribution
+    component: analytics
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: attribution-analytics
+subjects:
+- kind: ServiceAccount
+  name: attribution-analytics
+  namespace: attribution
+
+---
+# Monitoring cluster role binding
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: monitoring
+  labels:
+    app: attribution
+    component: monitoring
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: monitoring
+subjects:
+- kind: ServiceAccount
+  name: monitoring
+  namespace: monitoring
