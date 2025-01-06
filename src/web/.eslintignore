@@ -1,0 +1,18 @@
+node_modules/**
+
+# Build outputs
+dist/**
+build/**
+coverage/**
+
+# Public assets
+public/**
+*.min.js
+
+# Config files
+vite.config.ts
+jest.config.ts
+babel.config.js
+
+# Type declarations
+*.d.ts
