@@ -1,0 +1,92 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: attribution-backend
+  namespace: attribution
+  labels:
+    app: attribution-backend
+    component: api
+    environment: production
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "3000"
+    prometheus.io/path: "/metrics"
+spec:
+  # High availability requirement: Multiple replicas across AZs
+  replicas: 3
+  selector:
+    matchLabels:
+      app: attribution-backend
+  # Zero-downtime deployment strategy
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: attribution-backend
+    spec:
+      # Security context for pod-level security settings
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+      # Service account for RBAC
+      serviceAccountName: backend-service-account
+      containers:
+        - name: attribution-backend
+          # Using node:18-alpine as base image
+          image: attribution-analytics/backend:latest
+          ports:
+            - containerPort: 3000
+              protocol: TCP
+          # Resource limits to handle 10M+ events/day
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "1Gi"
+            limits:
+              cpu: "2"
+              memory: "4Gi"
+          # Health checks for high availability
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          # Configuration and secrets mounting
+          envFrom:
+            - configMapRef:
+                name: attribution-backend-config
+            - secretRef:
+                name: attribution-backend-secret
+      # Pod anti-affinity for high availability across AZs
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                        - attribution-backend
+                topologyKey: topology.kubernetes.io/zone
+      # Tolerations for node selection
+      tolerations:
+        - key: "node-role.kubernetes.io/general-purpose"
+          operator: "Exists"
+          effect: "NoSchedule"
+      # Node selector for appropriate node pool
+      nodeSelector:
+        node-role.kubernetes.io/general-purpose: "true"
