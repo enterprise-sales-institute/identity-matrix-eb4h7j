@@ -1,0 +1,161 @@
+{
+  "app": {
+    "name": "Multi-Touch Attribution Analytics",
+    "description": "Advanced marketing attribution analytics platform",
+    "version": "{{version}}",
+    "copyright": "© {{year}} All rights reserved"
+  },
+  "navigation": {
+    "dashboard": "Dashboard",
+    "analytics": "Analytics", 
+    "attribution": "Attribution",
+    "settings": "Settings",
+    "profile": "Profile",
+    "logout": "Logout",
+    "aria": {
+      "mainNav": "Main navigation",
+      "subNav": "Sub navigation",
+      "currentPage": "Current page: {{page}}"
+    }
+  },
+  "header": {
+    "theme": {
+      "light": "Light Mode",
+      "dark": "Dark Mode", 
+      "system": "System Theme",
+      "aria": {
+        "themeSwitch": "Switch theme to {{theme}}"
+      }
+    },
+    "user": {
+      "profile": "View Profile",
+      "settings": "Account Settings",
+      "logout": "Sign Out",
+      "aria": {
+        "userMenu": "User menu",
+        "notifications": "Notifications: {{count}} unread"
+      }
+    }
+  },
+  "actions": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "update": "Update",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "finish": "Finish",
+    "export": "Export",
+    "import": "Import",
+    "apply": "Apply",
+    "reset": "Reset",
+    "search": "Search",
+    "filter": "Filter",
+    "clear": "Clear",
+    "aria": {
+      "actionButton": "{{action}} {{item}}",
+      "loading": "Please wait while {{action}}",
+      "required": "Required action"
+    }
+  },
+  "status": {
+    "loading": "Loading...",
+    "success": "Success",
+    "error": "Error",
+    "warning": "Warning",
+    "info": "Information",
+    "aria": {
+      "status": "Current status: {{status}}",
+      "progress": "Progress: {{percent}}%"
+    }
+  },
+  "time": {
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "last7Days": "Last 7 Days",
+    "last30Days": "Last 30 Days",
+    "thisMonth": "This Month",
+    "lastMonth": "Last Month",
+    "custom": "Custom Range",
+    "format": {
+      "short": "MM/DD/YYYY",
+      "long": "MMMM D, YYYY",
+      "time": "HH:mm",
+      "datetime": "MMMM D, YYYY HH:mm"
+    }
+  },
+  "errors": {
+    "required": "This field is required",
+    "invalid": "Invalid value",
+    "networkError": "Network error occurred",
+    "unauthorized": "Unauthorized access",
+    "forbidden": "Access forbidden",
+    "notFound": "Resource not found",
+    "serverError": "Server error occurred",
+    "validation": {
+      "email": "Invalid email address",
+      "password": "Password must be at least 8 characters",
+      "date": "Invalid date format",
+      "number": "Must be a valid number"
+    },
+    "aria": {
+      "error": "Error: {{message}}",
+      "fieldError": "Error in field {{field}}: {{message}}"
+    }
+  },
+  "tooltips": {
+    "help": "Help",
+    "info": "Information",
+    "warning": "Warning",
+    "refresh": "Refresh Data",
+    "settings": "Open Settings",
+    "notifications": "View Notifications",
+    "aria": {
+      "tooltip": "{{type}} tooltip: {{content}}"
+    }
+  },
+  "notifications": {
+    "success": "Operation completed successfully",
+    "error": "An error occurred",
+    "warning": "Warning: {{message}}",
+    "info": "Information: {{message}}",
+    "aria": {
+      "notification": "{{type}} notification: {{message}}",
+      "dismiss": "Dismiss notification"
+    }
+  },
+  "accessibility": {
+    "skipToMain": "Skip to main content",
+    "menuOpen": "Open menu",
+    "menuClose": "Close menu",
+    "themeToggle": "Toggle theme",
+    "userMenu": "User menu",
+    "closeDialog": "Close dialog",
+    "navigation": {
+      "next": "Next page",
+      "previous": "Previous page",
+      "first": "First page",
+      "last": "Last page"
+    },
+    "aria": {
+      "required": "Required field",
+      "selected": "Selected",
+      "expanded": "Expanded",
+      "collapsed": "Collapsed",
+      "hasError": "Has error",
+      "loading": "Loading content"
+    }
+  },
+  "dateTime": {
+    "locale": "en-US",
+    "timezone": "UTC",
+    "format": {
+      "date": "MM/DD/YYYY",
+      "time": "HH:mm:ss",
+      "datetime": "MM/DD/YYYY HH:mm:ss"
+    }
+  }
+}
