@@ -1,0 +1,100 @@
+name: Web CI
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'src/web/**'
+  pull_request:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'src/web/**'
+
+env:
+  NODE_VERSION: '18.x'
+  WORKING_DIRECTORY: 'src/web'
+
+jobs:
+  build_and_test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          # Enable npm caching for faster installations
+          cache: 'npm'
+
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: npm-${{ hashFiles('src/web/package-lock.json') }}
+          restore-keys: |
+            npm-
+
+      - name: Install dependencies
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+        run: npm ci
+        # Using ci instead of install for clean installs and consistent builds
+
+      - name: Type check
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+        run: npm run typecheck
+        # Validates TypeScript types across the project
+
+      - name: Lint
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+        run: npm run lint
+        # Enforces code style and quality standards
+
+      - name: Run tests
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+        run: npm run test -- --coverage --maxWorkers=2
+        # Run tests with coverage reporting and optimized worker count
+        env:
+          CI: true
+
+      - name: Build
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+        run: npm run build
+        # Production build with optimizations
+        env:
+          CI: true
+          NODE_ENV: production
+
+      - name: Security audit
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+        run: |
+          npm audit
+          # Additional security checks could be added here
+        continue-on-error: false
+        # Fail the build if security vulnerabilities are found
+
+      - name: Upload coverage reports
+        if: success()
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-reports
+          path: ${{ env.WORKING_DIRECTORY }}/coverage
+          retention-days: 14
+          # Store test coverage reports for later analysis
+
+      - name: Upload build artifacts
+        if: success()
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-artifacts
+          path: ${{ env.WORKING_DIRECTORY }}/build
+          retention-days: 14
+          # Store build artifacts for deployment or analysis
