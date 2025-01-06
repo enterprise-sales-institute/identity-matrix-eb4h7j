@@ -1,0 +1,185 @@
+name: Web Application Deployment
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'src/web/**'
+      - 'infrastructure/kubernetes/web/**'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  id-token: write
+  contents: read
+  packages: read
+  security-events: write
+
+env:
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+  ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+  IMAGE_TAG: ${{ github.sha }}
+  ENVIRONMENT: ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}
+
+jobs:
+  validate:
+    name: Validate Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify CI Workflow
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const result = await github.rest.actions.listWorkflowRuns({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'web-ci.yml',
+              branch: context.ref,
+              status: 'completed'
+            });
+            const latestRun = result.data.workflow_runs[0];
+            if (latestRun.conclusion !== 'success') {
+              core.setFailed('CI workflow must pass before deployment');
+            }
+
+  deploy:
+    name: Deploy to ${{ matrix.environment }}
+    needs: validate
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - environment: staging
+            cluster: attribution-staging
+            namespace: attribution-staging
+            branch: develop
+            replicas: 2
+            cpu_request: 500m
+            memory_request: 1Gi
+            cpu_limit: 1000m
+            memory_limit: 2Gi
+          - environment: production
+            cluster: attribution-prod
+            namespace: attribution
+            branch: main
+            replicas: 3
+            cpu_request: 1000m
+            memory_request: 2Gi
+            cpu_limit: 2000m
+            memory_limit: 4Gi
+    if: github.ref == format('refs/heads/{0}', matrix.branch)
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+          role-duration-seconds: 1800
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+        with:
+          version: latest
+          buildkitd-flags: --debug
+
+      - name: Build Docker Image
+        uses: docker/build-push-action@v4
+        with:
+          context: ./src/web
+          file: ./src/web/Dockerfile
+          push: false
+          load: true
+          tags: ${{ env.ECR_REGISTRY }}/attribution-web:${{ env.IMAGE_TAG }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            NODE_ENV=${{ matrix.environment }}
+            API_BASE_URL=${{ secrets.API_BASE_URL }}
+            BUILD_VERSION=${{ env.IMAGE_TAG }}
+
+      - name: Scan Docker Image
+        uses: snyk/actions/docker@0.9.0
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          image: ${{ env.ECR_REGISTRY }}/attribution-web:${{ env.IMAGE_TAG }}
+          args: --severity-threshold=high
+
+      - name: Push Docker Image
+        uses: docker/build-push-action@v4
+        with:
+          context: ./src/web
+          file: ./src/web/Dockerfile
+          push: true
+          tags: ${{ env.ECR_REGISTRY }}/attribution-web:${{ env.IMAGE_TAG }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            NODE_ENV=${{ matrix.environment }}
+            API_BASE_URL=${{ secrets.API_BASE_URL }}
+            BUILD_VERSION=${{ env.IMAGE_TAG }}
+
+      - name: Update Kubeconfig
+        run: |
+          echo "${{ secrets.KUBE_CONFIG }}" > kubeconfig
+          export KUBECONFIG=kubeconfig
+
+      - name: Deploy to Kubernetes
+        uses: azure/k8s-deploy@v4
+        with:
+          namespace: ${{ matrix.namespace }}
+          manifests: |
+            infrastructure/kubernetes/web/deployment.yaml
+          images: |
+            ${{ env.ECR_REGISTRY }}/attribution-web:${{ env.IMAGE_TAG }}
+          strategy: canary
+          action: deploy
+          timeout: 300s
+          env-vars: |
+            NODE_ENV=${{ matrix.environment }}
+            REPLICAS=${{ matrix.replicas }}
+            CPU_REQUEST=${{ matrix.cpu_request }}
+            MEMORY_REQUEST=${{ matrix.memory_request }}
+            CPU_LIMIT=${{ matrix.cpu_limit }}
+            MEMORY_LIMIT=${{ matrix.memory_limit }}
+
+      - name: Verify Deployment
+        run: |
+          kubectl --kubeconfig=kubeconfig -n ${{ matrix.namespace }} rollout status deployment/web-frontend
+          kubectl --kubeconfig=kubeconfig -n ${{ matrix.namespace }} get pods -l app=web-frontend
+
+      - name: Cleanup
+        if: always()
+        run: |
+          rm -f kubeconfig
+          docker image prune -f
+
+  notify:
+    name: Send Deployment Notification
+    needs: deploy
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Notify Deployment Status
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const status = '${{ needs.deploy.result }}' === 'success' ? '✅ Success' : '❌ Failure';
+            const environment = '${{ env.ENVIRONMENT }}';
+            const message = `Deployment to ${environment} environment: ${status}`;
+            github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: message
+            });
