@@ -1,0 +1,1 @@
+You're making an analytics tool to show multi-touch attribution based on referrer and UTM data. You have a pixel installed on a site and it tracks the attribution of every lead.
