@@ -1,0 +1,105 @@
+{
+  "auth": {
+    "email": {
+      "required": "Email address is required",
+      "invalid": "Please enter a valid email address",
+      "exists": "An account with this email already exists",
+      "notFound": "No account found with this email address"
+    },
+    "password": {
+      "required": "Password is required",
+      "tooWeak": "Password is too weak. Please make it stronger",
+      "minLength": "Password must be at least {{count}} characters",
+      "complexity": "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character",
+      "mismatch": "Passwords do not match",
+      "invalid": "Invalid password format",
+      "expired": "Password has expired. Please reset your password"
+    },
+    "mfa": {
+      "required": "Two-factor authentication code is required",
+      "invalid": "Invalid authentication code",
+      "expired": "Authentication code has expired. Please request a new one"
+    }
+  },
+  "attribution": {
+    "model": {
+      "required": "Attribution model selection is required",
+      "invalid": "Please select a valid attribution model",
+      "incompatible": "Selected model is not compatible with current configuration"
+    },
+    "weights": {
+      "required": "Channel weights are required",
+      "sum": "Channel weights must sum to 100%",
+      "invalid": "Invalid weight value. Please enter a number between 0 and 100",
+      "minWeight": "Minimum weight for each channel is {{min}}%",
+      "maxWeight": "Maximum weight for each channel is {{max}}%"
+    },
+    "timeWindow": {
+      "required": "Time window selection is required",
+      "invalid": "Please select a valid time window",
+      "minDays": "Time window must be at least {{min}} days",
+      "maxDays": "Time window cannot exceed {{max}} days",
+      "overlap": "Time windows cannot overlap with existing configurations"
+    }
+  },
+  "analytics": {
+    "dateRange": {
+      "required": "Date range is required",
+      "invalid": "Please select a valid date range",
+      "future": "Date range cannot include future dates",
+      "maxRange": "Date range cannot exceed {{max}} days",
+      "minRange": "Date range must be at least {{min}} days"
+    },
+    "filters": {
+      "invalid": "Invalid filter configuration",
+      "required": "At least one filter is required",
+      "maxFilters": "Cannot exceed {{max}} filters",
+      "duplicate": "Duplicate filter values are not allowed",
+      "incompatible": "Selected filters are incompatible"
+    },
+    "metrics": {
+      "required": "At least one metric must be selected",
+      "invalid": "Invalid metric selection",
+      "maxMetrics": "Cannot exceed {{max}} metrics"
+    }
+  },
+  "common": {
+    "required": "This field is required",
+    "invalid": "Invalid input value",
+    "minLength": "Must be at least {{min}} characters",
+    "maxLength": "Cannot exceed {{max}} characters",
+    "number": {
+      "required": "Please enter a number",
+      "integer": "Please enter a whole number",
+      "decimal": "Please enter a decimal number",
+      "min": "Must be at least {{min}}",
+      "max": "Cannot exceed {{max}}",
+      "positive": "Must be a positive number",
+      "negative": "Must be a negative number"
+    },
+    "select": {
+      "required": "Please make a selection",
+      "invalid": "Invalid selection",
+      "min": "Please select at least {{min}} options",
+      "max": "Cannot select more than {{max}} options"
+    },
+    "input": {
+      "required": "Input is required",
+      "invalid": "Invalid input format",
+      "alphanumeric": "Only letters and numbers are allowed",
+      "alphabetic": "Only letters are allowed",
+      "numeric": "Only numbers are allowed",
+      "email": "Must be a valid email address",
+      "url": "Must be a valid URL",
+      "date": "Must be a valid date",
+      "phone": "Must be a valid phone number"
+    },
+    "aria": {
+      "error": "Error: {{message}}",
+      "success": "Success: {{message}}",
+      "required": "Required field",
+      "invalid": "Invalid field",
+      "selected": "Selected: {{value}}"
+    }
+  }
+}
