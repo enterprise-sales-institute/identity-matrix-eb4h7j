@@ -1,0 +1,87 @@
+version: 2
+updates:
+  # Backend dependencies configuration
+  - package-ecosystem: "npm"
+    directory: "/src/backend"
+    schedule:
+      interval: "daily"
+      time: "02:00"
+      timezone: "UTC"
+    target-branch: "develop"
+    labels:
+      - "dependencies"
+      - "backend"
+    assignees:
+      - "@team-leads"
+    reviewers:
+      - "@security-team"
+    commit-message:
+      prefix: "fix(deps)"
+      prefix-development: "chore(deps)"
+      include: "scope"
+    groups:
+      typescript-types:
+        patterns:
+          - "@types/*"
+        update-types:
+          - "major"
+          - "minor"
+          - "patch"
+      test-packages:
+        patterns:
+          - "jest*"
+          - "@testing-library/*"
+        update-types:
+          - "major"
+          - "minor"
+          - "patch"
+    ignore:
+      - dependency-name: "typescript"
+        versions: ["5.x"]
+    versioning-strategy: "auto"
+    allow:
+      - dependency-type: "direct"
+        update-type: ["security", "semver-minor", "semver-patch"]
+
+  # Frontend dependencies configuration
+  - package-ecosystem: "npm"
+    directory: "/src/web"
+    schedule:
+      interval: "daily"
+      time: "02:00"
+      timezone: "UTC"
+    target-branch: "develop"
+    labels:
+      - "dependencies"
+      - "frontend"
+    assignees:
+      - "@team-leads"
+    reviewers:
+      - "@security-team"
+    commit-message:
+      prefix: "fix(deps)"
+      prefix-development: "chore(deps)"
+      include: "scope"
+    groups:
+      react-packages:
+        patterns:
+          - "react*"
+          - "@types/react*"
+        update-types:
+          - "major"
+          - "minor"
+          - "patch"
+      mui-packages:
+        patterns:
+          - "@mui/*"
+        update-types:
+          - "major"
+          - "minor"
+          - "patch"
+    ignore:
+      - dependency-name: "typescript"
+        versions: ["5.x"]
+    versioning-strategy: "auto"
+    allow:
+      - dependency-type: "direct"
+        update-type: ["security", "semver-minor", "semver-patch"]
