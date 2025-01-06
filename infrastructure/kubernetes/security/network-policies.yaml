@@ -1,0 +1,83 @@
+# Kubernetes NetworkPolicy API version v1
+# Implements zero-trust network security model with explicit allow rules
+# Required CNI: Calico
+# Kubernetes version: >= 1.20.0
+
+---
+# Default deny-all policy to enforce zero-trust model
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-all
+  namespace: attribution
+  labels:
+    app.kubernetes.io/name: network-policy
+    app.kubernetes.io/component: security 
+    app.kubernetes.io/part-of: attribution
+  annotations:
+    security.attribution.io/policy-type: baseline
+    security.attribution.io/description: Default deny-all policy enforcing zero-trust model
+spec:
+  # Empty podSelector matches all pods in namespace
+  podSelector: {}
+  policyTypes:
+  - Ingress
+  - Egress
+
+---
+# Allow frontend to backend API communication
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: web-backend-policy
+  namespace: attribution
+  labels:
+    app.kubernetes.io/name: network-policy
+    app.kubernetes.io/component: security
+    app.kubernetes.io/part-of: attribution
+  annotations:
+    security.attribution.io/policy-type: service-communication
+    security.attribution.io/description: Allow frontend to backend API communication
+spec:
+  podSelector:
+    matchLabels:
+      app: attribution-backend
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: web-frontend
+    ports:
+    - protocol: TCP
+      port: 3000
+
+---
+# Allow ingress traffic to frontend service
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: web-frontend-policy
+  namespace: attribution
+  labels:
+    app.kubernetes.io/name: network-policy
+    app.kubernetes.io/component: security
+    app.kubernetes.io/part-of: attribution
+  annotations:
+    security.attribution.io/policy-type: ingress-access
+    security.attribution.io/description: Allow ingress traffic to frontend service
+spec:
+  podSelector:
+    matchLabels:
+      app: web-frontend
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: ingress-nginx
+    ports:
+    - protocol: TCP
+      port: 80
