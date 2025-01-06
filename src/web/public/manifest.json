@@ -1,0 +1,47 @@
+{
+  "name": "Multi-Touch Attribution Analytics",
+  "short_name": "MTA Analytics",
+  "description": "Enterprise analytics tool for tracking and attributing marketing touchpoints across customer journeys",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FFFFFF",
+  "theme_color": "#0066CC",
+  "orientation": "any",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon",
+      "purpose": "any"
+    }
+  ],
+  "categories": [
+    "analytics",
+    "business",
+    "marketing",
+    "productivity"
+  ],
+  "lang": "en-US",
+  "dir": "ltr",
+  "prefer_related_applications": false,
+  "display_override": [
+    "standalone",
+    "minimal-ui"
+  ],
+  "shortcuts": [
+    {
+      "name": "Dashboard",
+      "url": "/dashboard",
+      "description": "View analytics dashboard"
+    },
+    {
+      "name": "Attribution Models",
+      "url": "/models",
+      "description": "Configure attribution models"
+    }
+  ],
+  "screenshots": [],
+  "related_applications": [],
+  "protocol_handlers": []
+}
