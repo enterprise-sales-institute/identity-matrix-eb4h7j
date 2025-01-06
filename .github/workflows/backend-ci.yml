@@ -1,0 +1,106 @@
+name: Backend CI
+
+on:
+  push:
+    branches: 
+      - main
+      - develop
+    paths:
+      - 'src/backend/**'
+  pull_request:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'src/backend/**'
+
+env:
+  NODE_VERSION: '18.x'
+  COVERAGE_THRESHOLD: '80'
+
+jobs:
+  validate:
+    name: Validate Backend
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      security-events: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # Full history for better analysis
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: 'src/backend/package.json'
+
+      - name: Install dependencies
+        working-directory: src/backend
+        run: npm ci
+        
+      - name: Cache node modules
+        uses: actions/cache@v3
+        with:
+          path: src/backend/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('src/backend/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Run ESLint
+        working-directory: src/backend
+        run: |
+          npm run lint
+          echo "::error file=eslint-report.json::ESLint found errors"
+        continue-on-error: false
+
+      - name: TypeScript compilation check
+        working-directory: src/backend
+        run: npm run type-check
+
+      - name: Security scan
+        working-directory: src/backend
+        run: |
+          npm audit
+          npx snyk test --severity-threshold=medium
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        continue-on-error: false
+
+      - name: Run tests with coverage
+        working-directory: src/backend
+        run: |
+          npm run test:coverage
+          if [ $(jq -r '.total.lines.pct' coverage/coverage-summary.json) -lt ${{ env.COVERAGE_THRESHOLD }} ]; then
+            echo "Test coverage below threshold of ${{ env.COVERAGE_THRESHOLD }}%"
+            exit 1
+          fi
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-report
+          path: src/backend/coverage
+          retention-days: 14
+
+      - name: Build application
+        working-directory: src/backend
+        run: npm run build
+
+      - name: Upload security scan results
+        uses: github/codeql-action/upload-sarif@v2
+        if: always()
+        with:
+          sarif_file: src/backend/security-scan-results.sarif
+          category: backend-security-scan
+
+      - name: Notify on failure
+        if: failure()
+        run: |
+          echo "::error::Backend CI validation failed. Check the logs for details."
+          exit 1
