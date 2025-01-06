@@ -1,0 +1,291 @@
+openapi: 3.0.0
+
+info:
+  title: Multi-Touch Attribution Analytics API
+  version: 1.0.0
+  description: |
+    Enterprise-grade API for tracking, analyzing, and attributing marketing touchpoints across the customer journey.
+    Provides comprehensive endpoints for event tracking, attribution modeling, and analytics reporting.
+  contact:
+    name: API Support
+    email: support@attribution-analytics.com
+    url: https://docs.attribution-analytics.com
+  license:
+    name: Proprietary
+    url: https://attribution-analytics.com/license
+
+servers:
+  - url: /api/v1
+    description: Production API server
+  - url: /api/v1/staging
+    description: Staging API server
+
+security:
+  - bearerAuth: []
+  - apiKeyAuth: []
+
+tags:
+  - name: Events
+    description: Event tracking and management endpoints
+  - name: Attribution
+    description: Attribution modeling and analysis endpoints
+  - name: Analytics
+    description: Analytics and reporting endpoints
+
+paths:
+  /events:
+    post:
+      tags:
+        - Events
+      summary: Track new event
+      description: Records a new marketing touchpoint or conversion event
+      security:
+        - apiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventRequest'
+      responses:
+        '201':
+          description: Event tracked successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+
+  /events/{visitorId}:
+    get:
+      tags:
+        - Events
+      summary: Get visitor events
+      description: Retrieves events for a specific visitor
+      parameters:
+        - $ref: '#/components/parameters/VisitorId'
+        - $ref: '#/components/parameters/TimeRange'
+        - $ref: '#/components/parameters/Pagination'
+      responses:
+        '200':
+          description: Events retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventListResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /attribution/calculate:
+    post:
+      tags:
+        - Attribution
+      summary: Calculate attribution
+      description: Calculates attribution weights for touchpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AttributionRequest'
+      responses:
+        '200':
+          description: Attribution calculated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttributionResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /analytics/query:
+    get:
+      tags:
+        - Analytics
+      summary: Query analytics data
+      description: Retrieves analytics data with filtering and aggregation
+      parameters:
+        - $ref: '#/components/parameters/TimeRange'
+        - $ref: '#/components/parameters/Metrics'
+        - $ref: '#/components/parameters/Dimensions'
+      responses:
+        '200':
+          description: Analytics data retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyticsResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token authentication
+    apiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: API key authentication
+
+  schemas:
+    Event:
+      type: object
+      required:
+        - id
+        - visitorId
+        - sessionId
+        - type
+        - timestamp
+        - properties
+      properties:
+        id:
+          type: string
+          format: uuid
+        visitorId:
+          type: string
+        sessionId:
+          type: string
+        type:
+          type: string
+          enum: [PAGE_VIEW, CLICK, CONVERSION, CUSTOM, FORM_SUBMIT, SCROLL, ENGAGEMENT]
+        timestamp:
+          type: string
+          format: date-time
+        properties:
+          type: object
+          additionalProperties: true
+
+    AttributionModel:
+      type: object
+      required:
+        - model
+        - timeRange
+        - channelWeights
+      properties:
+        model:
+          type: string
+          enum: [FIRST_TOUCH, LAST_TOUCH, LINEAR, POSITION_BASED, TIME_DECAY]
+        timeRange:
+          $ref: '#/components/schemas/TimeRange'
+        channelWeights:
+          type: object
+          additionalProperties:
+            type: number
+            minimum: 0
+            maximum: 1
+
+    AnalyticsMetric:
+      type: string
+      enum: [CONVERSION_RATE, REVENUE, TOUCHPOINTS, ATTRIBUTION_WEIGHT]
+
+    TimeRange:
+      type: object
+      required:
+        - startDate
+        - endDate
+      properties:
+        startDate:
+          type: string
+          format: date-time
+        endDate:
+          type: string
+          format: date-time
+
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        details:
+          type: object
+
+  parameters:
+    VisitorId:
+      name: visitorId
+      in: path
+      required: true
+      schema:
+        type: string
+
+    TimeRange:
+      name: timeRange
+      in: query
+      schema:
+        $ref: '#/components/schemas/TimeRange'
+
+    Metrics:
+      name: metrics
+      in: query
+      schema:
+        type: array
+        items:
+          $ref: '#/components/schemas/AnalyticsMetric'
+
+    Dimensions:
+      name: dimensions
+      in: query
+      schema:
+        type: array
+        items:
+          type: string
+          enum: [CHANNEL, CAMPAIGN, TIME, SOURCE]
+
+    Pagination:
+      name: pagination
+      in: query
+      schema:
+        type: object
+        properties:
+          limit:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+          offset:
+            type: integer
+            minimum: 0
+            default: 0
+
+  responses:
+    BadRequest:
+      description: Invalid request parameters
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    TooManyRequests:
+      description: Rate limit exceeded
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+      headers:
+        X-RateLimit-Limit:
+          schema:
+            type: integer
+        X-RateLimit-Remaining:
+          schema:
+            type: integer
+        X-RateLimit-Reset:
+          schema:
+            type: integer
