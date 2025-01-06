@@ -1,0 +1,41 @@
+# Kubernetes Service manifest for Prometheus monitoring system
+# Version: v1.26+
+# Purpose: Exposes Prometheus metrics collection endpoints and web interface
+
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: prometheus-service
+  namespace: monitoring
+  labels:
+    app: prometheus
+    component: monitoring
+    tier: observability
+    managed-by: attribution-platform
+  annotations:
+    # Enable Prometheus scraping on this service
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "9090"
+    # Ensure service is only accessible internally
+    service.beta.kubernetes.io/aws-load-balancer-internal: "true"
+
+spec:
+  # Use ClusterIP for secure internal access only
+  type: ClusterIP
+  
+  ports:
+    - port: 9090  # Service port
+      targetPort: 9090  # Container port
+      protocol: TCP
+      name: http-prometheus
+  
+  # Select pods with the prometheus app label
+  selector:
+    app: prometheus
+  
+  # Don't maintain session affinity
+  sessionAffinity: None
+  
+  # Only publish endpoints for ready pods
+  publishNotReadyAddresses: false
