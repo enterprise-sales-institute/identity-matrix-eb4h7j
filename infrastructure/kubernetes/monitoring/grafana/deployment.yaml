@@ -1,0 +1,87 @@
+# Grafana Deployment Manifest
+# Version: 9.5.3
+# Purpose: Deploys Grafana monitoring dashboard with high availability and resource optimization
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grafana
+  namespace: monitoring
+  labels:
+    app: grafana
+    component: monitoring
+spec:
+  # High availability configuration with 2 replicas
+  replicas: 2
+  selector:
+    matchLabels:
+      app: grafana
+  
+  # Rolling update strategy for zero-downtime deployments
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  
+  template:
+    metadata:
+      labels:
+        app: grafana
+    spec:
+      # Container specifications
+      containers:
+      - name: grafana
+        image: grafana/grafana:9.5.3
+        ports:
+        - containerPort: 3000
+          name: http
+          protocol: TCP
+        
+        # Resource limits and requests for optimal performance
+        resources:
+          requests:
+            cpu: "200m"
+            memory: "512Mi"
+          limits:
+            cpu: "500m"
+            memory: "1Gi"
+        
+        # Volume mounts for configuration, dashboards and persistent storage
+        volumeMounts:
+        - name: config
+          mountPath: /etc/grafana
+        - name: dashboards
+          mountPath: /var/lib/grafana/dashboards
+        - name: storage
+          mountPath: /var/lib/grafana
+        
+        # Health checks for container lifecycle management
+        livenessProbe:
+          httpGet:
+            path: /api/health
+            port: 3000
+          initialDelaySeconds: 60
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /api/health
+            port: 3000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+      
+      # Volume definitions for configuration and data persistence
+      volumes:
+      - name: config
+        configMap:
+          name: grafana-config
+      - name: dashboards
+        configMap:
+          name: grafana-dashboards
+      - name: storage
+        emptyDir: {}
+      
+      # Security context for running Grafana as non-root user
+      securityContext:
+        fsGroup: 472  # Grafana group ID
+        runAsUser: 472 # Grafana user ID
