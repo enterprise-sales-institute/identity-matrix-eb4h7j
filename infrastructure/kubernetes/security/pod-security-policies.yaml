@@ -1,0 +1,95 @@
+apiVersion: policy/v1beta1
+kind: PodSecurityPolicy
+metadata:
+  name: attribution-restricted
+  annotations:
+    # Seccomp profile annotations
+    seccomp.security.alpha.kubernetes.io/allowedProfileNames: 'runtime/default'
+    seccomp.security.alpha.kubernetes.io/defaultProfileName: 'runtime/default'
+    # AppArmor profile annotations  
+    apparmor.security.beta.kubernetes.io/allowedProfileNames: 'runtime/default'
+    apparmor.security.beta.kubernetes.io/defaultProfileName: 'runtime/default'
+    # Documentation annotations
+    kubernetes.io/description: 'Restricted PSP for attribution analytics system enforcing security best practices'
+    kubernetes.io/psp-version: 'v1beta1'
+spec:
+  # Prevent privileged containers and privilege escalation
+  privileged: false
+  allowPrivilegeEscalation: false
+  defaultAllowPrivilegeEscalation: false
+
+  # Drop all capabilities by default
+  requiredDropCapabilities:
+    - "ALL"
+  allowedCapabilities: []
+
+  # Restrict volume types to only necessary ones
+  volumes:
+    - 'configMap'
+    - 'emptyDir' 
+    - 'projected'
+    - 'secret'
+    - 'downwardAPI'
+    - 'persistentVolumeClaim'
+
+  # Prevent host namespace sharing
+  hostNetwork: false
+  hostIPC: false 
+  hostPID: false
+
+  # Enforce non-root user with specific UID range
+  runAsUser:
+    rule: 'MustRunAsNonRoot'
+    ranges:
+    - min: 1000
+      max: 65535
+
+  # SELinux context requirements
+  seLinux:
+    rule: 'RunAsAny'
+
+  # Supplemental groups requirements
+  supplementalGroups:
+    rule: 'MustRunAs'
+    ranges:
+    - min: 1000
+      max: 65535
+
+  # FSGroup requirements  
+  fsGroup:
+    rule: 'MustRunAs' 
+    ranges:
+    - min: 1000
+      max: 65535
+
+  # Enforce read-only root filesystem
+  readOnlyRootFilesystem: true
+
+  # Prevent host path mounts
+  allowedHostPaths: []
+
+  # Sysctls restrictions
+  forbiddenSysctls:
+    - '*'
+
+  # Additional security hardening
+  hostPorts: []
+  allowedFlexVolumes: []
+  allowedCSIDrivers: []
+  allowedUnsafeSysctls: []
+  defaultAddCapabilities: []
+  requiredDropCapabilities:
+    - "ALL"
+  allowedProcMountTypes:
+    - "Default"
+
+  # Runtime class restrictions  
+  runtimeClass:
+    allowedRuntimeClassNames:
+      - "runc"
+    defaultRuntimeClassName: "runc"
+
+  # Windows specific settings (even though we're Linux-only, good practice to specify)
+  windowsOptions:
+    allowPrivilegeEscalation: false
+    runAsUserName: "ContainerUser"
