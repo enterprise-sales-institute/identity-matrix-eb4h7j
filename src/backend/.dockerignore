@@ -1,0 +1,40 @@
+node_modules
+.npm
+
+# Build artifacts
+dist
+build
+
+# Test artifacts
+coverage
+__tests__
+.nyc_output
+
+# Logs
+*.log
+npm-debug.log*
+
+# Security-sensitive files
+.env*
+*.key
+*.pem
+.ssh/
+
+# Version control
+.git
+.gitignore
+
+# Documentation
+*.md
+docs
+
+# Development files
+.vscode
+.idea
+.eslintcache
+nodemon.json
+.DS_Store
+
+# Docker files
+docker-compose*
+.dockerignore
