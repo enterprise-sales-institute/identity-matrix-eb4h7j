@@ -1,0 +1,363 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": "-- Grafana --",
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "description": "Performance monitoring dashboard for the Multi-Touch Attribution Analytics Platform",
+  "editable": true,
+  "gnetId": null,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "title": "System Performance Overview",
+      "type": "row",
+      "collapse": false,
+      "panels": [
+        {
+          "title": "Request Latency",
+          "type": "graph",
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 0
+          },
+          "targets": [
+            {
+              "expr": "histogram_quantile(0.95, sum(rate(attribution_request_duration_seconds_bucket[5m])) by (le))",
+              "legendFormat": "95th Percentile",
+              "refId": "A"
+            }
+          ],
+          "yaxes": [
+            {
+              "format": "s",
+              "label": "Duration",
+              "min": 0
+            }
+          ],
+          "alert": {
+            "name": "High Latency Alert",
+            "conditions": [
+              {
+                "evaluator": {
+                  "params": [5],
+                  "type": "gt"
+                },
+                "operator": {
+                  "type": "and"
+                },
+                "query": {
+                  "params": ["A", "5m", "now"]
+                },
+                "reducer": {
+                  "params": [],
+                  "type": "avg"
+                },
+                "type": "query"
+              }
+            ]
+          }
+        },
+        {
+          "title": "Request Rate",
+          "type": "graph",
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 0
+          },
+          "targets": [
+            {
+              "expr": "sum(rate(attribution_http_requests_total[5m])) by (endpoint)",
+              "legendFormat": "{{endpoint}}",
+              "refId": "A"
+            }
+          ],
+          "yaxes": [
+            {
+              "format": "short",
+              "label": "Requests/sec",
+              "min": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Attribution Processing",
+      "type": "row",
+      "collapse": false,
+      "panels": [
+        {
+          "title": "Attribution Calculation Duration",
+          "type": "graph",
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 9
+          },
+          "targets": [
+            {
+              "expr": "histogram_quantile(0.95, sum(rate(attribution_calculation_duration_seconds_bucket[5m])) by (le, model))",
+              "legendFormat": "{{model}}",
+              "refId": "A"
+            }
+          ],
+          "yaxes": [
+            {
+              "format": "s",
+              "label": "Duration",
+              "min": 0
+            }
+          ]
+        },
+        {
+          "title": "Event Processing Rate",
+          "type": "graph",
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 9
+          },
+          "targets": [
+            {
+              "expr": "sum(rate(attribution_event_processing_duration_seconds_count[5m]))",
+              "legendFormat": "Events/sec",
+              "refId": "A"
+            }
+          ],
+          "yaxes": [
+            {
+              "format": "short",
+              "label": "Events/sec",
+              "min": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Data Quality",
+      "type": "row",
+      "collapse": false,
+      "panels": [
+        {
+          "title": "Data Loss Rate",
+          "type": "gauge",
+          "gridPos": {
+            "h": 8,
+            "w": 8,
+            "x": 0,
+            "y": 18
+          },
+          "targets": [
+            {
+              "expr": "attribution_data_loss_ratio * 100",
+              "refId": "A"
+            }
+          ],
+          "options": {
+            "maxValue": 1,
+            "minValue": 0,
+            "thresholds": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 0.05
+              },
+              {
+                "color": "red",
+                "value": 0.1
+              }
+            ],
+            "unit": "percent"
+          }
+        },
+        {
+          "title": "Data Accuracy",
+          "type": "gauge",
+          "gridPos": {
+            "h": 8,
+            "w": 8,
+            "x": 8,
+            "y": 18
+          },
+          "targets": [
+            {
+              "expr": "attribution_data_accuracy_ratio * 100",
+              "refId": "A"
+            }
+          ],
+          "options": {
+            "maxValue": 100,
+            "minValue": 0,
+            "thresholds": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 99
+              },
+              {
+                "color": "green",
+                "value": 99.9
+              }
+            ],
+            "unit": "percent"
+          }
+        },
+        {
+          "title": "System Uptime",
+          "type": "gauge",
+          "gridPos": {
+            "h": 8,
+            "w": 8,
+            "x": 16,
+            "y": 18
+          },
+          "targets": [
+            {
+              "expr": "avg_over_time(up{job=\"attribution-backend\"}[24h]) * 100",
+              "refId": "A"
+            }
+          ],
+          "options": {
+            "maxValue": 100,
+            "minValue": 0,
+            "thresholds": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 99
+              },
+              {
+                "color": "green",
+                "value": 99.9
+              }
+            ],
+            "unit": "percent"
+          }
+        }
+      ]
+    },
+    {
+      "title": "Business KPIs",
+      "type": "row",
+      "collapse": false,
+      "panels": [
+        {
+          "title": "Conversion Rate",
+          "type": "graph",
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 27
+          },
+          "targets": [
+            {
+              "expr": "attribution_conversion_rate_percent",
+              "legendFormat": "Conversion Rate",
+              "refId": "A"
+            }
+          ],
+          "yaxes": [
+            {
+              "format": "percent",
+              "label": "Rate",
+              "min": 0,
+              "max": 100
+            }
+          ]
+        },
+        {
+          "title": "Active Users",
+          "type": "graph",
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 27
+          },
+          "targets": [
+            {
+              "expr": "attribution_active_users_total",
+              "legendFormat": "Active Users",
+              "refId": "A"
+            }
+          ],
+          "yaxes": [
+            {
+              "format": "short",
+              "label": "Users",
+              "min": 0
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "refresh": "10s",
+  "schemaVersion": 27,
+  "style": "dark",
+  "tags": ["attribution", "performance", "monitoring"],
+  "templating": {
+    "list": [
+      {
+        "name": "datasource",
+        "type": "datasource",
+        "query": "prometheus",
+        "current": {
+          "selected": true,
+          "text": "Prometheus",
+          "value": "Prometheus"
+        }
+      }
+    ]
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "5s",
+      "10s",
+      "30s",
+      "1m",
+      "5m",
+      "15m",
+      "30m",
+      "1h",
+      "2h",
+      "1d"
+    ]
+  },
+  "timezone": "browser",
+  "title": "Attribution Analytics Performance",
+  "uid": "attribution-performance",
+  "version": 1
+}
