@@ -1,0 +1,37 @@
+Format: ICO (Windows Icon)
+Embedded Resolutions: 16x16, 24x24, 32x32, 64x64
+Color Depth: 32-bit RGBA
+Total File Size: < 32KB
+Background: Transparent
+Compression: RLE where applicable
+
+Image Details:
+- Each resolution contains a full 32-bit RGBA bitmap
+- Alpha channel enabled for smooth edges and transparency
+- Optimized color palette per resolution
+- RLE compression applied to reduce file size
+- PNG compression used for 32-bit images within ICO container
+
+Embedded Resolutions:
+1. 16x16 - Standard favicon for browser tabs
+2. 24x24 - Windows taskbar and intermediate displays
+3. 32x32 - High DPI displays and enhanced browser tabs
+4. 64x64 - Windows Start menu and ultra-high density displays
+
+Browser Support:
+- Chrome 90+
+- Firefox 88+
+- Safari 14+
+- Edge 90+
+- iOS Safari 14+
+- Android Chrome 90+
+
+Cache Headers:
+Cache-Control: public, max-age=31536000
+ETag: Enabled
+Content-based hash for versioning
+
+PWA Integration:
+- Serves as primary app icon
+- Non-maskable icon type
+- Used in browser tabs, bookmarks, and shortcuts
