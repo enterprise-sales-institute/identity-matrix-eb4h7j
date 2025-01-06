@@ -1,0 +1,38 @@
+# Kubernetes Service manifest for Jaeger distributed tracing system
+# Version: v1.26+
+# Purpose: Exposes Jaeger UI and collector endpoints for distributed tracing capabilities
+apiVersion: v1
+kind: Service
+metadata:
+  name: jaeger-service
+  namespace: monitoring
+  labels:
+    app: jaeger
+    component: tracing
+    part-of: monitoring-stack
+    managed-by: kubernetes
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "16686"
+spec:
+  type: ClusterIP
+  ports:
+    # Jaeger UI interface port
+    - name: http-ui
+      port: 16686
+      targetPort: 16686
+      protocol: TCP
+    # gRPC collector endpoint for trace ingestion
+    - name: grpc-collector
+      port: 14250
+      targetPort: 14250
+      protocol: TCP
+    # Zipkin-compatible collector endpoint
+    - name: zipkin-collector
+      port: 9411
+      targetPort: 9411
+      protocol: TCP
+  selector:
+    app: jaeger
+    component: tracing
+  sessionAffinity: None
