@@ -1,0 +1,72 @@
+# Production namespace configuration for the Multi-Touch Attribution Analytics System
+# Version: 1.0
+# This configuration implements production-grade resource management, security controls,
+# and operational policies for high-availability production workloads
+
+---
+# Namespace Definition
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: attribution-prod
+  labels:
+    name: attribution-prod
+    environment: production
+    istio-injection: enabled  # Enable service mesh for mTLS and traffic management
+    security-tier: production
+    backup-policy: enabled
+    monitoring: enabled
+  annotations:
+    scheduler.alpha.kubernetes.io/node-selector: env=production
+    net.beta.kubernetes.io/network-policy: enabled
+    compliance.security.policy/pci-dss: enabled  # Enable PCI-DSS compliance controls
+    backup.velero.io/backup-volumes: "true"  # Enable volume backups
+
+---
+# Resource Quota Configuration
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: attribution-prod-quota
+  namespace: attribution-prod
+spec:
+  hard:
+    # Compute Resources
+    requests.cpu: "24"  # Total CPU requests allowed in namespace
+    requests.memory: "48Gi"  # Total memory requests allowed
+    limits.cpu: "32"  # Maximum CPU limits
+    limits.memory: "64Gi"  # Maximum memory limits
+    
+    # Object Count Limits
+    pods: "50"  # Maximum number of pods
+    services: "20"  # Maximum number of services
+    persistentvolumeclaims: "15"  # Maximum number of PVCs
+    secrets: "30"  # Maximum number of secrets
+    configmaps: "30"  # Maximum number of configmaps
+
+---
+# Container Resource Limits
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: attribution-prod-limits
+  namespace: attribution-prod
+spec:
+  limits:
+    - type: Container
+      # Default resource allocation if not specified
+      default:
+        cpu: "500m"  # 0.5 CPU cores
+        memory: "512Mi"
+      # Default resource requests if not specified
+      defaultRequest:
+        cpu: "250m"  # 0.25 CPU cores
+        memory: "256Mi"
+      # Maximum allowed resources per container
+      max:
+        cpu: "4"  # 4 CPU cores
+        memory: "8Gi"
+      # Minimum required resources per container
+      min:
+        cpu: "100m"  # 0.1 CPU cores
+        memory: "128Mi"
