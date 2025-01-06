@@ -1,0 +1,39 @@
+# Version: 1.0.0
+# Last Updated: 2024
+# Purpose: Control crawler access and implement security controls
+# Security Notice: This file is part of the security architecture
+# Contact: security@[domain] for issues
+
+# Global rules for all crawlers
+User-agent: *
+
+# Disallow access to sensitive application routes
+Disallow: /api/
+Disallow: /analytics/
+Disallow: /attribution/
+Disallow: /settings/
+Disallow: /login/
+Disallow: /dashboard/
+Disallow: /admin/
+Disallow: /user/
+Disallow: /private/
+Disallow: /internal/
+
+# Allow access to public resources
+Allow: /
+Allow: /public/
+Allow: /manifest.json
+Allow: /favicon.ico
+Allow: /assets/
+Allow: /images/
+Allow: /docs/public/
+
+# Crawl rate control
+Crawl-delay: 10
+
+# Sitemap location
+Sitemap: https://[domain]/sitemap.xml
+
+# Security headers included in server configuration:
+# X-Robots-Tag: noarchive, noimageindex
+# Cache-Control: public, max-age=3600
