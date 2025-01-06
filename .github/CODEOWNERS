@@ -1,0 +1,27 @@
+*                                    @project-leads
+
+# Backend source code ownership
+src/backend/                         @backend-team
+src/backend/src/core/attribution/    @attribution-team @backend-team
+src/backend/src/core/analytics/      @analytics-team @backend-team
+src/backend/src/database/           @database-team @backend-team
+src/backend/src/lib/security/       @security-team @backend-team
+src/backend/tests/security/         @security-team @qa-team
+
+# Frontend source code ownership
+src/web/                            @frontend-team
+src/web/src/tracking/               @tracking-team @frontend-team
+
+# Infrastructure and deployment code ownership
+infrastructure/                      @devops-team
+infrastructure/kubernetes/           @k8s-team @devops-team
+infrastructure/terraform/            @terraform-team @devops-team
+
+# CI/CD and automation ownership
+.github/workflows/                   @ci-team @devops-team
+
+# Documentation ownership
+docs/security/                       @security-team @documentation-team
+
+# Configuration management ownership
+config/                             @devops-team @security-team
