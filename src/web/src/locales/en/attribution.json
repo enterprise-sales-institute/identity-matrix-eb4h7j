@@ -1,0 +1,171 @@
+{
+  "models": {
+    "title": "Attribution Models",
+    "description": "Configure and manage attribution models",
+    "types": {
+      "firstTouch": "First Touch",
+      "lastTouch": "Last Touch",
+      "linear": "Linear",
+      "timeDecay": "Time Decay",
+      "positionBased": "Position Based",
+      "customModel": "Custom Attribution Model"
+    },
+    "configuration": {
+      "title": "Model Configuration",
+      "modelName": "Model Name",
+      "modelType": "Model Type",
+      "attributionWindow": "Attribution Window",
+      "channelWeights": "Channel Weights",
+      "customRules": "Custom Rules",
+      "applyChanges": "Apply Changes",
+      "resetDefaults": "Reset to Defaults",
+      "saveModel": "Save Model",
+      "deleteModel": "Delete Model",
+      "confirmDelete": "Are you sure you want to delete this model?",
+      "unsavedChanges": "You have unsaved changes. Do you want to continue?"
+    },
+    "parameters": {
+      "decayRate": "Decay Rate",
+      "halfLife": "Half Life",
+      "firstTouchWeight": "First Touch Weight",
+      "lastTouchWeight": "Last Touch Weight",
+      "middleTouchWeight": "Middle Touch Weight",
+      "customWeights": "Custom Weights",
+      "minimumWeight": "Minimum Weight",
+      "maximumWeight": "Maximum Weight",
+      "weightDistribution": "Weight Distribution"
+    },
+    "validation": {
+      "nameRequired": "Model name is required",
+      "typeRequired": "Model type is required",
+      "weightsTotal": "Weights must total 100%",
+      "invalidDecayRate": "Decay rate must be between 0 and 1",
+      "invalidWeight": "Weight must be between 0 and 100",
+      "duplicateName": "A model with this name already exists",
+      "invalidTimeWindow": "Attribution window must be between 1 and 90 days",
+      "incompatibleRules": "Selected rules are incompatible with model type",
+      "missingParameters": "Required parameters are missing",
+      "invalidFormat": "Invalid format for {{field}}"
+    }
+  },
+  "channels": {
+    "social": "Social Media",
+    "email": "Email",
+    "ppc": "Paid Search",
+    "organic": "Organic Search",
+    "direct": "Direct",
+    "referral": "Referral",
+    "display": "Display Ads",
+    "affiliate": "Affiliate",
+    "video": "Video Ads",
+    "mobile": "Mobile Apps",
+    "custom": "Custom Channel"
+  },
+  "touchpoints": {
+    "title": "Touchpoint Analysis",
+    "analysis": {
+      "title": "Analysis Details",
+      "conversionRate": "Conversion Rate",
+      "averageValue": "Average Value",
+      "timeToConvert": "Time to Convert",
+      "touchpointCount": "Touchpoint Count",
+      "pathLength": "Path Length",
+      "interactionDepth": "Interaction Depth",
+      "engagementScore": "Engagement Score",
+      "influenceScore": "Influence Score"
+    },
+    "journey": {
+      "title": "Customer Journey",
+      "startPoint": "Journey Start",
+      "endPoint": "Conversion Point",
+      "intermediatePoints": "Intermediate Touchpoints",
+      "pathAnalysis": "Path Analysis",
+      "commonPaths": "Common Paths",
+      "uniquePaths": "Unique Paths",
+      "dropoffPoints": "Dropoff Points",
+      "reengagementPoints": "Reengagement Points"
+    },
+    "metrics": {
+      "influence": "Channel Influence",
+      "contribution": "Revenue Contribution",
+      "efficiency": "Channel Efficiency",
+      "roi": "Channel ROI",
+      "cpa": "Cost Per Acquisition",
+      "roas": "Return on Ad Spend",
+      "frequency": "Touchpoint Frequency",
+      "recency": "Touchpoint Recency"
+    },
+    "filters": {
+      "dateRange": "Date Range",
+      "channels": "Channels",
+      "conversions": "Conversions",
+      "pathLength": "Path Length",
+      "value": "Conversion Value",
+      "segment": "Customer Segment",
+      "campaign": "Campaign",
+      "source": "Traffic Source",
+      "medium": "Traffic Medium"
+    }
+  },
+  "visualization": {
+    "title": "Journey Visualization",
+    "legend": {
+      "title": "Legend",
+      "conversion": "Conversion",
+      "dropout": "Dropout",
+      "interaction": "Interaction",
+      "strongPath": "Strong Path",
+      "weakPath": "Weak Path",
+      "criticalPoint": "Critical Point"
+    },
+    "controls": {
+      "zoomIn": "Zoom In",
+      "zoomOut": "Zoom Out",
+      "reset": "Reset View",
+      "fullscreen": "Fullscreen",
+      "pan": "Pan View",
+      "select": "Select Elements",
+      "filter": "Filter View",
+      "highlight": "Highlight Path"
+    },
+    "tooltips": {
+      "node": "Channel: {{channel}}\nTouchpoints: {{count}}\nValue: {{value}}\nConversion Rate: {{rate}}%",
+      "edge": "Conversion Rate: {{rate}}%\nTransitions: {{count}}\nAverage Time: {{time}}",
+      "path": "Path Frequency: {{frequency}}%\nAverage Value: {{value}}\nCompletion Rate: {{rate}}%"
+    }
+  },
+  "reports": {
+    "title": "Attribution Reports",
+    "types": {
+      "summary": "Summary Report",
+      "detailed": "Detailed Analysis",
+      "comparison": "Model Comparison",
+      "trends": "Attribution Trends",
+      "pathAnalysis": "Path Analysis Report",
+      "channelPerformance": "Channel Performance",
+      "conversionAnalysis": "Conversion Analysis",
+      "customReport": "Custom Report"
+    },
+    "filters": {
+      "title": "Report Filters",
+      "period": "Time Period",
+      "models": "Attribution Models",
+      "channels": "Marketing Channels",
+      "segments": "Customer Segments",
+      "campaigns": "Marketing Campaigns",
+      "conversions": "Conversion Types",
+      "metrics": "Performance Metrics"
+    },
+    "export": {
+      "title": "Export Report",
+      "pdf": "Export as PDF",
+      "csv": "Export as CSV",
+      "excel": "Export as Excel",
+      "json": "Export as JSON",
+      "scheduling": "Schedule Export",
+      "format": "Export Format",
+      "includeCharts": "Include Visualizations",
+      "dataGranularity": "Data Granularity"
+    }
+  }
+}
