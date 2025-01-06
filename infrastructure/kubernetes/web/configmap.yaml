@@ -1,0 +1,53 @@
+# ConfigMap for Multi-Touch Attribution Analytics Web Frontend
+# Version: 1.0.0
+# Purpose: Stores non-sensitive environment configuration for the React frontend application
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: web-config
+  namespace: dev # Using dev namespace from dev.yaml
+  labels:
+    app: web-frontend
+    component: frontend
+    environment: development
+    version: 1.0.0
+    team: development-team
+    cost-center: development
+  annotations:
+    description: "Frontend configuration for Multi-Touch Attribution Analytics Tool"
+    last-updated: "2023-08-01"
+    maintainer: "dev-team@company.com"
+
+data:
+  # API Configuration
+  # Base URL for API endpoints with versioning
+  VITE_API_BASE_URL: "https://api.dev.attribution-analytics.com/api/v1"
+  
+  # Auth0 Configuration
+  # Authentication provider settings for frontend integration
+  VITE_AUTH0_DOMAIN: "attribution-analytics-dev.auth0.com"
+  VITE_AUTH0_CLIENT_ID: "${AUTH0_CLIENT_ID}"
+  VITE_AUTH0_AUDIENCE: "https://api.dev.attribution-analytics.com"
+  VITE_AUTH0_REDIRECT_URI: "https://dev.attribution-analytics.com/callback"
+  VITE_AUTH0_LOGOUT_REDIRECT_URI: "https://dev.attribution-analytics.com"
+  
+  # Application Configuration
+  VITE_APP_NAME: "Multi-Touch Attribution Analytics"
+  VITE_APP_VERSION: "1.0.0"
+  VITE_APP_ENVIRONMENT: "development"
+  
+  # Feature Flags and Debug Settings
+  VITE_DEBUG_MODE: "true" # Enabled for development environment
+  VITE_ENABLE_ANALYTICS: "true"
+  VITE_ENABLE_ERROR_REPORTING: "true"
+  
+  # UI Configuration
+  VITE_DEFAULT_THEME: "light"
+  VITE_DEFAULT_LANGUAGE: "en"
+  VITE_SUPPORT_EMAIL: "support@attribution-analytics.com"
+  
+  # Performance Configuration
+  VITE_MAX_CACHE_AGE: "3600"
+  VITE_API_TIMEOUT: "30000"
+  VITE_RETRY_ATTEMPTS: "3"
