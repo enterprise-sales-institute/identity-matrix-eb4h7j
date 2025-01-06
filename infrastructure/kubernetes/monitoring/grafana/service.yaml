@@ -1,0 +1,38 @@
+# Kubernetes Service manifest for Grafana monitoring dashboard
+# Version: v1
+# Purpose: Exposes Grafana internally for secure access to system metrics and analytics
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: grafana-service
+  namespace: monitoring
+  labels:
+    app: grafana
+    component: monitoring
+    tier: visualization
+    part-of: attribution-analytics
+  annotations:
+    description: "Internal Grafana service for monitoring system metrics and performance"
+    monitoring.attribution-analytics.io/critical: "true"
+
+spec:
+  # Using ClusterIP for secure internal-only access
+  type: ClusterIP
+  
+  # Port configuration for Grafana web interface
+  ports:
+    - name: http-grafana
+      port: 3000
+      targetPort: 3000
+      protocol: TCP
+
+  # Label selector to match Grafana deployment pods
+  selector:
+    app: grafana
+
+  # Disable session affinity for better load distribution
+  sessionAffinity: None
+
+  # Internal traffic policy for improved security
+  internalTrafficPolicy: Cluster
