@@ -1,0 +1,114 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-config
+  namespace: attribution-analytics
+  labels:
+    app: attribution-backend
+    environment: production
+data:
+  # Server Configuration
+  SERVER_PORT: "3000"
+  SERVER_HOST: "0.0.0.0"
+  NODE_ENV: "production"
+  API_VERSION: "v1"
+  
+  # CORS Configuration
+  CORS_ORIGINS: "https://*.attribution-analytics.com"
+  CORS_METHODS: "GET,POST,PUT,DELETE,OPTIONS"
+  CORS_ALLOWED_HEADERS: "Content-Type,Authorization,X-Request-ID"
+  CORS_MAX_AGE: "86400"
+  
+  # Rate Limiting Configuration
+  RATE_LIMIT_WINDOW_MS: "900000"
+  RATE_LIMIT_MAX_REQUESTS: "1000"
+  RATE_LIMIT_SKIP_FAILED: "true"
+  
+  # PostgreSQL Configuration
+  POSTGRES_HOST: "postgres-service"
+  POSTGRES_PORT: "5432"
+  POSTGRES_DB: "attribution"
+  POSTGRES_POOL_MIN: "5"
+  POSTGRES_POOL_MAX: "20"
+  POSTGRES_POOL_IDLE_TIMEOUT: "10000"
+  POSTGRES_CONNECTION_TIMEOUT: "60000"
+  POSTGRES_SSL_REJECT_UNAUTHORIZED: "true"
+  POSTGRES_PRIMARY_HOST: "postgres-primary-service"
+  POSTGRES_READ_REPLICAS: "postgres-replica-0:5432,postgres-replica-1:5432"
+  
+  # ClickHouse Configuration
+  CLICKHOUSE_HOST: "clickhouse-service"
+  CLICKHOUSE_PORT: "8123"
+  CLICKHOUSE_DB: "attribution_analytics"
+  CLICKHOUSE_POOL_MIN: "3"
+  CLICKHOUSE_POOL_MAX: "15"
+  CLICKHOUSE_POOL_IDLE_TIMEOUT: "10000"
+  CLICKHOUSE_COMPRESSION_METHOD: "lz4"
+  CLICKHOUSE_COMPRESSION_LEVEL: "1"
+  CLICKHOUSE_CLUSTER_NAME: "attribution_cluster"
+  CLICKHOUSE_CLUSTER_NODES: "clickhouse-0:8123,clickhouse-1:8123,clickhouse-2:8123"
+  
+  # Redis Configuration
+  REDIS_HOST: "redis-service"
+  REDIS_PORT: "6379"
+  REDIS_DB: "0"
+  REDIS_CLUSTER_ENABLED: "true"
+  REDIS_CLUSTER_NODES: "redis-0:6379,redis-1:6379,redis-2:6379"
+  REDIS_MAX_REDIRECTIONS: "16"
+  REDIS_RETRY_DELAY: "100"
+  REDIS_SENTINEL_MASTER_NAME: "attribution-master"
+  REDIS_SENTINEL_NODES: "sentinel-0:26379,sentinel-1:26379,sentinel-2:26379"
+  REDIS_TLS_ENABLED: "true"
+  
+  # Kafka Configuration
+  KAFKA_BROKERS: "kafka-service-0:9092,kafka-service-1:9092,kafka-service-2:9092"
+  KAFKA_CLIENT_ID: "attribution-analytics"
+  KAFKA_GROUP_ID: "attribution-analytics-group"
+  KAFKA_SESSION_TIMEOUT: "30000"
+  KAFKA_HEARTBEAT_INTERVAL: "3000"
+  KAFKA_MAX_BATCH_SIZE: "1000"
+  KAFKA_READ_BATCH_TIMEOUT: "1000"
+  KAFKA_COMPRESSION_TYPE: "gzip"
+  KAFKA_COMPRESSION_LEVEL: "5"
+  KAFKA_TOPIC_EVENTS: "raw-events"
+  KAFKA_TOPIC_ANALYTICS: "processed-analytics"
+  KAFKA_TOPIC_ATTRIBUTION: "attribution-results"
+  KAFKA_TOPIC_DLQ: "dead-letter-queue"
+  
+  # Logging Configuration
+  LOG_LEVEL: "info"
+  LOG_FORMAT: "json"
+  LOG_ENABLE_CONSOLE: "true"
+  LOG_ENABLE_FILE: "true"
+  LOG_FILENAME: "/var/log/attribution-analytics.log"
+  LOG_MAX_SIZE: "100m"
+  LOG_MAX_FILES: "7d"
+  LOG_CORRELATION_ID_ENABLED: "true"
+  LOG_CORRELATION_ID_HEADER: "X-Correlation-ID"
+  
+  # Metrics Configuration
+  METRICS_ENABLED: "true"
+  METRICS_COLLECT_DEFAULT: "true"
+  METRICS_PREFIX: "attribution_analytics_"
+  METRICS_DEFAULT_LABELS: "service=attribution-backend,environment=production"
+  METRICS_PUSHGATEWAY_ENABLED: "true"
+  METRICS_PUSHGATEWAY_URL: "http://prometheus-pushgateway:9091"
+  METRICS_PUSHGATEWAY_JOB: "attribution_metrics"
+  
+  # Health Check Configuration
+  HEALTH_CHECK_ENABLED: "true"
+  HEALTH_CHECK_PATH: "/health"
+  HEALTH_CHECK_INTERVAL: "30000"
+  
+  # Database Migration Configuration
+  DB_MIGRATIONS_DIR: "/app/migrations"
+  DB_MIGRATIONS_TABLE: "migrations"
+  DB_MIGRATIONS_SCHEMA: "public"
+  DB_MIGRATIONS_TRANSACTIONAL: "true"
+  
+  # Backup Configuration
+  DB_BACKUP_ENABLED: "true"
+  DB_BACKUP_SCHEDULE: "0 0 * * *"
+  DB_BACKUP_RETENTION: "7"
+  DB_BACKUP_PATH: "/backups"
+  DB_BACKUP_COMPRESS: "true"
