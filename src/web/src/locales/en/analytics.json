@@ -1,0 +1,169 @@
+{
+  "dashboard": {
+    "title": "Attribution Dashboard",
+    "timeRange": {
+      "label": "Time Period",
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "last7Days": "Last 7 Days",
+      "last30Days": "Last 30 Days",
+      "lastQuarter": "Last Quarter",
+      "lastYear": "Last Year",
+      "custom": "Custom Range",
+      "apply": "Apply Range",
+      "reset": "Reset"
+    },
+    "metrics": {
+      "totalRevenue": "Total Revenue",
+      "totalConversions": "Total Conversions",
+      "averageROI": "Average ROI",
+      "topChannel": "Top Channel",
+      "conversionRate": "Conversion Rate",
+      "averageOrderValue": "Average Order Value",
+      "customerLifetimeValue": "Customer Lifetime Value",
+      "costPerAcquisition": "Cost Per Acquisition"
+    },
+    "actions": {
+      "export": "Export Data",
+      "exportFormats": {
+        "csv": "CSV Format",
+        "excel": "Excel Format",
+        "pdf": "PDF Report"
+      },
+      "settings": "Settings",
+      "refresh": "Refresh Data",
+      "share": "Share Dashboard",
+      "save": "Save View",
+      "reset": "Reset View"
+    },
+    "loading": {
+      "initial": "Loading dashboard data...",
+      "refresh": "Refreshing dashboard...",
+      "export": "Preparing export...",
+      "metrics": "Calculating metrics..."
+    },
+    "error": {
+      "loading": "Error loading dashboard data",
+      "refresh": "Error refreshing data",
+      "export": "Error exporting data",
+      "metrics": "Error calculating metrics",
+      "retry": "Retry",
+      "contact": "Contact Support"
+    }
+  },
+  "channelPerformance": {
+    "title": "Channel Performance",
+    "metrics": {
+      "conversionRate": "Conversion Rate",
+      "revenue": "Revenue",
+      "touchpoints": "Touchpoints",
+      "attributionWeight": "Attribution Weight",
+      "engagementRate": "Engagement Rate",
+      "bounceRate": "Bounce Rate",
+      "averageTimeOnChannel": "Average Time on Channel",
+      "returnVisitorRate": "Return Visitor Rate"
+    },
+    "chart": {
+      "title": "Performance Trends",
+      "xAxis": "Time Period",
+      "yAxis": "Performance",
+      "legend": "Channels",
+      "tooltips": {
+        "point": "Click for details",
+        "comparison": "vs. previous period",
+        "trend": "Trend direction"
+      }
+    },
+    "channels": {
+      "social": "Social Media",
+      "email": "Email",
+      "ppc": "PPC",
+      "direct": "Direct",
+      "organic": "Organic Search",
+      "referral": "Referral",
+      "display": "Display Ads",
+      "affiliate": "Affiliate",
+      "video": "Video Marketing",
+      "other": "Other Sources"
+    },
+    "loading": "Loading channel data...",
+    "error": "Error loading channel data",
+    "noData": "No channel data available"
+  },
+  "journeyVisualization": {
+    "title": "Customer Journey Analysis",
+    "filters": {
+      "title": "Journey Filters",
+      "channels": "Select Channels",
+      "touchpoints": "Touchpoint Count",
+      "conversions": "Show Conversions Only",
+      "dateRange": "Date Range",
+      "segments": "Customer Segments",
+      "value": "Order Value Range",
+      "interactions": "Interaction Types"
+    },
+    "paths": {
+      "title": "Path Analysis",
+      "entryPoints": "Entry Points",
+      "exitPoints": "Exit Points",
+      "commonPaths": "Common Paths",
+      "pathLength": "Path Length",
+      "conversionProbability": "Conversion Probability",
+      "dropoffPoints": "Dropoff Points"
+    },
+    "touchpoint": {
+      "details": "Touchpoint Details",
+      "conversionRate": "Conversion Rate",
+      "averageValue": "Average Value",
+      "timeToConvert": "Time to Convert",
+      "frequency": "Interaction Frequency",
+      "engagement": "Engagement Level",
+      "impact": "Attribution Impact",
+      "position": "Journey Position"
+    },
+    "actions": {
+      "exportReport": "Export Report",
+      "saveView": "Save View",
+      "shareAnalysis": "Share Analysis",
+      "compareJourneys": "Compare Journeys",
+      "resetView": "Reset View",
+      "expandPath": "Expand Path"
+    },
+    "loading": "Loading journey data...",
+    "error": "Error loading journey data",
+    "noData": "No journey data available"
+  },
+  "common": {
+    "percentage": "{{value}}%",
+    "currency": {
+      "standard": "${{value}}",
+      "detailed": "${{value}}.{{cents}}",
+      "thousands": "${{value}}k",
+      "millions": "${{value}}M"
+    },
+    "number": {
+      "standard": "{{value}}",
+      "thousands": "{{value}}k",
+      "millions": "{{value}}M",
+      "billions": "{{value}}B"
+    },
+    "date": {
+      "short": "{{date}}",
+      "long": "{{date}} {{time}}",
+      "relative": "{{timeAgo}}",
+      "range": "{{startDate}} - {{endDate}}"
+    },
+    "time": {
+      "standard": "{{time}}",
+      "duration": "{{hours}}h {{minutes}}m",
+      "relative": "{{value}} {{unit}} ago"
+    },
+    "status": {
+      "success": "Success",
+      "error": "Error",
+      "warning": "Warning",
+      "info": "Information",
+      "loading": "Loading..."
+    }
+  }
+}
