@@ -1,0 +1,166 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-config
+  namespace: monitoring
+  labels:
+    app: prometheus
+    component: monitoring
+    part-of: attribution-platform
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: 15s
+      evaluation_interval: 15s
+      scrape_timeout: 10s
+      external_labels:
+        environment: production
+        cluster: attribution-platform
+
+    # Alertmanager configuration
+    alerting:
+      alertmanagers:
+      - static_configs:
+        - targets:
+          - alertmanager:9093
+
+    # Rule files to load
+    rule_files:
+      - /etc/prometheus/rules/*.yml
+
+    # Scrape configurations
+    scrape_configs:
+      # Attribution Backend Services
+      - job_name: 'attribution-backend'
+        metrics_path: '/metrics'
+        scheme: 'https'
+        tls_config:
+          insecure_skip_verify: false
+        kubernetes_sd_configs:
+          - role: service
+            namespaces:
+              names: ['default']
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_service_label_app]
+            regex: attribution-backend
+            action: keep
+          - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_scrape]
+            action: keep
+            regex: true
+          - source_labels: [__meta_kubernetes_service_name]
+            target_label: service
+          - source_labels: [__meta_kubernetes_namespace]
+            target_label: namespace
+          - source_labels: [__meta_kubernetes_service_port_name]
+            target_label: endpoint
+
+      # Node Exporter
+      - job_name: 'node-exporter'
+        kubernetes_sd_configs:
+          - role: node
+        relabel_configs:
+          - action: labelmap
+            regex: __meta_kubernetes_node_label_(.+)
+          - target_label: __address__
+            replacement: kubernetes.default.svc:443
+          - source_labels: [__meta_kubernetes_node_name]
+            regex: (.+)
+            target_label: __metrics_path__
+            replacement: /api/v1/nodes/${1}/proxy/metrics
+
+      # Kubernetes Pods
+      - job_name: 'kubernetes-pods'
+        kubernetes_sd_configs:
+          - role: pod
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+            action: keep
+            regex: true
+          - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]
+            action: replace
+            target_label: __metrics_path__
+            regex: (.+)
+          - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_port]
+            action: replace
+            regex: ([^:]+)(?::\d+)?;(\d+)
+            replacement: $1:$2
+            target_label: __address__
+          - action: labelmap
+            regex: __meta_kubernetes_pod_label_(.+)
+          - source_labels: [__meta_kubernetes_namespace]
+            action: replace
+            target_label: kubernetes_namespace
+          - source_labels: [__meta_kubernetes_pod_name]
+            action: replace
+            target_label: kubernetes_pod_name
+
+    # Alert Rules
+    alerting_rules:
+      - name: attribution_alerts
+        rules:
+          # Performance Alerts
+          - alert: HighLatency
+            expr: attribution_request_duration_seconds > 5
+            for: 5m
+            labels:
+              severity: critical
+              team: backend
+            annotations:
+              description: "Attribution request latency exceeds 5 seconds"
+              summary: "High latency detected in attribution service"
+              runbook_url: "https://wiki.example.com/attribution/alerts/high-latency"
+
+          # Data Quality Alerts
+          - alert: DataLossRate
+            expr: attribution_data_loss_ratio > 0.001
+            for: 5m
+            labels:
+              severity: critical
+              team: data
+            annotations:
+              description: "Data loss rate exceeds 0.1%"
+              summary: "High data loss rate detected"
+              runbook_url: "https://wiki.example.com/attribution/alerts/data-loss"
+
+          # System Uptime Alerts
+          - alert: SystemUptime
+            expr: up{job="attribution-backend"} != 1
+            for: 1m
+            labels:
+              severity: critical
+              team: sre
+            annotations:
+              description: "Attribution backend service is down"
+              summary: "Service availability affected"
+              runbook_url: "https://wiki.example.com/attribution/alerts/uptime"
+
+          # Resource Utilization Alerts
+          - alert: HighMemoryUsage
+            expr: container_memory_usage_bytes{container_name="attribution-backend"} / container_spec_memory_limit_bytes{container_name="attribution-backend"} > 0.85
+            for: 15m
+            labels:
+              severity: warning
+              team: sre
+            annotations:
+              description: "Memory usage above 85% for attribution backend"
+              summary: "High memory utilization detected"
+
+    # Recording Rules for SLAs and metrics
+    recording_rules:
+      - name: attribution_slas
+        rules:
+          # Success Rate Recording
+          - record: attribution:request_success_rate
+            expr: sum(rate(attribution_requests_total{status="success"}[5m])) / sum(rate(attribution_requests_total[5m]))
+
+          # Data Accuracy Recording
+          - record: attribution:data_accuracy
+            expr: 1 - (sum(attribution_data_errors_total) / sum(attribution_data_processed_total))
+
+          # Latency Percentiles
+          - record: attribution:request_duration:p95
+            expr: histogram_quantile(0.95, sum(rate(attribution_request_duration_bucket[5m])) by (le))
+
+          # System Load Recording
+          - record: attribution:system_load
+            expr: sum(rate(attribution_requests_total[5m])) by (service, endpoint)
